@@ -221,6 +221,12 @@ pub trait Hasher {
     fn finalize(self, output: &mut [u8]);
 }
 
+///
+pub trait HasherExt: Hasher {
+    ///
+    fn finalize_no_padding(self, output: &mut [u8]);
+}
+
 /// A trait used to convert [`Hasher`] into it's [`Xof`] counterpart.
 ///
 /// # Example
@@ -439,6 +445,14 @@ impl<P: Permutation> KeccakState<P> {
             self.fill_block();
         }
 
+        self.squeeze_no_padding(output)
+    }
+
+    fn squeeze_no_padding(&mut self, output: &mut [u8]) {
+        if let Mode::Absorbing = self.mode {
+            self.mode = Mode::Squeezing;
+        }
+
         // second foldp
         let mut op = 0;
         let mut l = output.len();
@@ -459,6 +473,10 @@ impl<P: Permutation> KeccakState<P> {
 
     fn finalize(mut self, output: &mut [u8]) {
         self.squeeze(output);
+    }
+
+    fn finalize_no_padding(mut self, output: &mut [u8]) {
+        self.squeeze_no_padding(output);
     }
 
     fn fill_block(&mut self) {

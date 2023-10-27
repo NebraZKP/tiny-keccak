@@ -1,5 +1,7 @@
 //! The `Keccak` hash functions.
 
+use crate::HasherExt;
+
 use super::{bits_to_rate, keccakf::KeccakF, Hasher, KeccakState};
 
 /// The `Keccak` hash functions defined in [`Keccak SHA3 submission`].
@@ -89,5 +91,11 @@ impl Hasher for Keccak {
     /// ```
     fn finalize(self, output: &mut [u8]) {
         self.state.finalize(output);
+    }
+}
+
+impl HasherExt for Keccak {
+    fn finalize_no_padding(self, output: &mut [u8]) {
+        self.state.finalize_no_padding(output);
     }
 }
